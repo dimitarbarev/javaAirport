@@ -1,4 +1,4 @@
-package com.example.javaairport;
+package sem4.javaAirport;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
