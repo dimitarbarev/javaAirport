@@ -11,26 +11,23 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "boardingPass")
-public class BoardingPassEntity {
+@Table(name = "action")
+public class ActionEntity {
 
     @EmbeddedId
-    private BoardingPassID id;
+    private ActionID id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("customerId")
-    @JoinColumn(name = "customer_id")
-    private CustomerEntity customer;
+    @MapsId("employeeId")
+    @JoinColumn(name = "employee_id")
+    private EmployeeEntity employee;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("baggageId")
     @JoinColumn(name = "baggage_id")
     private BaggageEntity baggage;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("flightId")
-    @JoinColumn(name = "flight_id")
-    private FlightEntity flight;
-
+    @Column(name = "type")
+    private String type;
 
 }

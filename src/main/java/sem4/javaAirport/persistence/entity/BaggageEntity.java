@@ -16,7 +16,8 @@ public class BaggageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "baggage_id")
-    private Long addressId;
+    private Long baggageId;
+
     @Column(name = "code")
     private String code;
 
@@ -27,9 +28,9 @@ public class BaggageEntity {
     @JoinColumn(name = "boardingPass_id")
     private BoardingPassEntity boardingPass;
 
-    @Column(name = "country")
-    private String country;
+    @Column(name = "status")
+    private String status;
 
-    @Column(name = "post_code")
-    private String postCode;
+    @Column(name = "remark")
+    private String remark;
 }
