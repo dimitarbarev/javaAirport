@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -22,9 +24,9 @@ public class CustomerEntity {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "boardingPass_id")
-    private BoardingPassEntity boardingPass;
+    private Set<BoardingPassEntity> boardingPass;
 
     @Column(name = "country")
     private String country;

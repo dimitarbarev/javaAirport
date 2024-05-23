@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Entity
 @Data
 @Builder
@@ -14,20 +16,22 @@ import lombok.NoArgsConstructor;
 @Table(name = "action")
 public class ActionEntity {
 
-    @EmbeddedId
-    private ActionID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "action_id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("employeeId")
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("baggageId")
-    @JoinColumn(name = "baggage_id")
+    @JoinColumn(name = "baggage")
     private BaggageEntity baggage;
 
     @Column(name = "type")
     private String type;
 
+    @Column(name = "datetime")
+    private Date datetime;
 }

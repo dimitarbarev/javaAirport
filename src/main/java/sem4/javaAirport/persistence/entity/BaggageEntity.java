@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -33,4 +35,7 @@ public class BaggageEntity {
 
     @Column(name = "remark")
     private String remark;
+
+    @OneToMany(mappedBy = "baggage")
+    private Set<ActionEntity> actionsSet;
 }
