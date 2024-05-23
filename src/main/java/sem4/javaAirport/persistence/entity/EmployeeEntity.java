@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -25,5 +27,6 @@ public class EmployeeEntity {
     @Column(name = "jobTitle")
     private String jobTitle;
 
-
+    @OneToMany (mappedBy = "employee")
+    private Set<ActionEntity> actionsSet;
 }

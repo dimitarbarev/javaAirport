@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Entity
 @Data
 @Builder
@@ -14,21 +16,19 @@ import lombok.NoArgsConstructor;
 @Table(name = "boardingPass")
 public class BoardingPassEntity {
 
-    @EmbeddedId
-    private BoardingPassID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("customerId")
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("baggageId")
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "baggage_id")
-    private BaggageEntity baggage;
+    private Set<BaggageEntity> baggageSet;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("flightId")
     @JoinColumn(name = "flight_id")
     private FlightEntity flight;
 
