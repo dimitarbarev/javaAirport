@@ -39,6 +39,27 @@ public class QRController {
             return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
         }
     }
+
+    @PostMapping("/moveToNextStatus")
+    public ResponseEntity<String> moveToNextStatus(@RequestParam Long baggageId) {
+        try {
+            baggageService.moveToNextStatus(baggageId);
+            return ResponseEntity.ok("Baggage status moved to next successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error moving to next status: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/triggerManualCheck")
+    public ResponseEntity<String> triggerManualCheck(@RequestParam Long baggageId) {
+        try {
+            baggageService.triggerManualCheck(baggageId);
+            return ResponseEntity.ok("Baggage status updated to MANUAL_CHECK");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
+        }
+    }
+
 }
 
 
