@@ -19,7 +19,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class QRController {
     private final IQRGenerator qrGenerator;
-    @Autowired
     private final IBaggageService baggageService;
 
     @GetMapping("/generateQRCode")

@@ -90,7 +90,7 @@ public class BaggageService implements IBaggageService {
 
 
     private boolean isWeightSuspicious(Double weight) {
-        // Define your weight criteria here
+        // Define weight criteria here
         return weight != null && (weight > 50.0 || weight < 5.0); // Example threshold
     }
 

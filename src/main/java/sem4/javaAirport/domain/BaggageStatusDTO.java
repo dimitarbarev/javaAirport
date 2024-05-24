@@ -14,6 +14,6 @@ public class BaggageStatusDTO {
     private Long baggageId;
     private BaggageStatus newStatus;
 
-    // Constructors, getters and setters
+
 }
 
