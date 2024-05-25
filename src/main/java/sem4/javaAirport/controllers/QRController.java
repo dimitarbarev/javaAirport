@@ -39,6 +39,13 @@ public class QRController {
         }
     }
 
+    public void scanQRCode(BaggageStatusDTO statusUpdate) {
+        try {
+            baggageService.updateBaggageStatus(statusUpdate.getBaggageId(), statusUpdate.getNewStatus());
+        } catch (Exception e) {
+            System.out.println("Error updating status: " + e.getMessage());
+        }
+    }
     @PostMapping("/moveToNextStatus")
     public ResponseEntity<String> moveToNextStatus(@RequestParam Long baggageId) {
         try {

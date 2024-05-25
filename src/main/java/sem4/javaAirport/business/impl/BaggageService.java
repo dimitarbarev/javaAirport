@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sem4.javaAirport.business.IBaggageService;
-import sem4.javaAirport.domain.BaggageStatusDTO;
 import sem4.javaAirport.persistence.BaggageRepository;
 import sem4.javaAirport.persistence.entity.BaggageEntity;
 import sem4.javaAirport.persistence.entity.BaggageStatus;
@@ -13,8 +12,8 @@ import sem4.javaAirport.persistence.entity.BaggageStatus;
 @AllArgsConstructor
 public class BaggageService implements IBaggageService {
 
-    @Autowired
-    private BaggageRepository baggageRepository;
+//    @Autowired
+    private final BaggageRepository baggageRepository;
 
 
     @Override
