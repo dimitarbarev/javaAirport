@@ -1,5 +1,6 @@
 package sem4.javaAirport.business.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,8 @@ import sem4.javaAirport.persistence.BaggageRepository;
 import sem4.javaAirport.persistence.entity.BaggageEntity;
 import sem4.javaAirport.persistence.entity.BaggageStatus;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class BaggageService implements IBaggageService {
@@ -15,17 +18,32 @@ public class BaggageService implements IBaggageService {
 //    @Autowired
     private final BaggageRepository baggageRepository;
 
-
-    @Override
-    public void updateBaggageStatus(Long baggageId, BaggageStatus newStatus) throws Exception {
-        BaggageEntity baggage = baggageRepository.findById(baggageId)
-                .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
-        baggage.setStatus(newStatus);
-        baggageRepository.save(baggage);
+    @Transactional
+    public void testUpdateBaggageStatus() {
+        try {
+            updateBaggageStatus(1L, BaggageStatus.SECURITY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    @Transactional
+    public void updateBaggageStatus(Long baggageId, BaggageStatus newStatus) throws Exception {
+        Optional<BaggageEntity> baggageOpt = baggageRepository.findById(baggageId);
+        if (baggageOpt.isPresent()) {
+            BaggageEntity baggage = baggageOpt.get();
+            baggage.setStatus(newStatus);
+            baggageRepository.save(baggage);
+            System.out.println("Baggage status updated in the database: " + baggage);
+        } else {
+            System.out.println("Baggage not found with ID: " + baggageId);
+        }
+    }
+
+
     public void moveToNextStatus(Long baggageId) throws Exception {
-        BaggageEntity baggage = baggageRepository.findById((long) baggageId)
+        BaggageEntity baggage = baggageRepository.findById(baggageId)
                 .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
 
         BaggageStatus currentStatus = baggage.getStatus();
@@ -70,8 +88,9 @@ public class BaggageService implements IBaggageService {
         return isWeightSuspicious(baggage.getWeight()) || isSizeSuspicious(baggage.getSize()) || isRandomlySelected();
     }
 
+    @Transactional
     public void triggerManualCheck(Long baggageId) throws Exception {
-        BaggageEntity baggage = baggageRepository.findById((long) baggageId)
+        BaggageEntity baggage = baggageRepository.findById(baggageId)
                 .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
 
         baggage.setStatus(BaggageStatus.MANUAL_CHECK);

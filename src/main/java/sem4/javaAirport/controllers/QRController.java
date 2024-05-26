@@ -28,20 +28,23 @@ public class QRController {
     }
 
     @PostMapping("/scanQRCode")
-    public ResponseEntity<String> scanQRCode(@RequestBody BufferedImage qrCodeData) {
+    public ResponseEntity<String> scanQRCodeEndpoint(@RequestBody BaggageStatusDTO statusUpdate) {
         try {
-            // Here, decodeQRCode should take a BufferedImage. Adjust this as per your application's flow.
-            BaggageStatusDTO statusUpdate = QRCodeDecoder.decodeQRCode(qrCodeData);
+            System.out.println("Received status update request: " + statusUpdate);
             baggageService.updateBaggageStatus(statusUpdate.getBaggageId(), statusUpdate.getNewStatus());
+            System.out.println("Baggage status updated successfully.");
             return ResponseEntity.ok("Baggage status updated successfully");
         } catch (Exception e) {
+            System.out.println("Error updating status: " + e.getMessage());
             return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
         }
     }
 
     public void scanQRCode(BaggageStatusDTO statusUpdate) {
         try {
+            System.out.println("Processing status update: " + statusUpdate);
             baggageService.updateBaggageStatus(statusUpdate.getBaggageId(), statusUpdate.getNewStatus());
+            System.out.println("Baggage status updated successfully.");
         } catch (Exception e) {
             System.out.println("Error updating status: " + e.getMessage());
         }
