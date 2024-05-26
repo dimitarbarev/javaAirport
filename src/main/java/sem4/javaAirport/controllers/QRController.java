@@ -7,7 +7,6 @@ import sem4.javaAirport.business.IBaggageService;
 import sem4.javaAirport.business.IQRGenerator;
 import com.google.zxing.WriterException;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import sem4.javaAirport.business.impl.QRCodeDecoder;
 import sem4.javaAirport.domain.BaggageStatusDTO;
 
@@ -29,8 +28,9 @@ public class QRController {
     }
 
     @PostMapping("/scanQRCode")
-    public ResponseEntity<String> scanQRCode(@RequestBody String qrCodeData) {
+    public ResponseEntity<String> scanQRCode(@RequestBody BufferedImage qrCodeData) {
         try {
+            // Here, decodeQRCode should take a BufferedImage. Adjust this as per your application's flow.
             BaggageStatusDTO statusUpdate = QRCodeDecoder.decodeQRCode(qrCodeData);
             baggageService.updateBaggageStatus(statusUpdate.getBaggageId(), statusUpdate.getNewStatus());
             return ResponseEntity.ok("Baggage status updated successfully");
