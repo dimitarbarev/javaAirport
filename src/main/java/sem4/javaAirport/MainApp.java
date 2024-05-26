@@ -69,16 +69,20 @@ public class MainApp extends Application {
             Mat frame = new Mat();
             while (capture.read(frame)) {
                 BufferedImage bufferedImage = matToBufferedImage(frame);
-                Platform.runLater(() -> imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null)));
-                try {
-                    BaggageStatusDTO statusUpdate = QRCodeDecoder.decodeQRCode(bufferedImage);
-                    if (statusUpdate != null) {
-                        qrController.scanQRCode(statusUpdate);
-                        System.out.println("Baggage status updated successfully");
+                Platform.runLater(() -> {
+                    imageView.setImage(bufferedImageToImage(bufferedImage));
+                    try {
+                        BaggageStatusDTO statusUpdate = QRCodeDecoder.decodeQRCode(bufferedImage);
+                        if (statusUpdate != null) {
+                            qrController.scanQRCode(statusUpdate);
+                            System.out.println("Baggage status updated successfully");
+                        }
+                    } catch (com.google.zxing.NotFoundException e) {
+                        System.out.println("QR code not found: " + e.getMessage());
+                    } catch (Exception e) {
+                        System.out.println("Error updating status: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.out.println("QR code not found: " + e.getMessage());
-                }
+                });
                 try {
                     Thread.sleep(30);
                 } catch (InterruptedException e) {
@@ -100,6 +104,10 @@ public class MainApp extends Application {
         final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
         System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
         return image;
+    }
+
+    private Image bufferedImageToImage(BufferedImage bufferedImage) {
+        return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
     @Override
