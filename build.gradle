@@ -32,6 +32,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    //for sqlite
+    implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
+
 //    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //    implementation 'org.springframework.boot:spring-boot-starter'
 //    implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -52,7 +56,7 @@ dependencies {
 //    //testImplementation 'org.springframework.security:spring-security-test'
 ////    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 //
-//    //for QR code generation
+    //for QR code generation
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.google.zxing:javase:3.4.1'
 //

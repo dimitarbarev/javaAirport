@@ -12,8 +12,8 @@ import sem4.javaAirport.persistence.entity.*;
 @Component
 @AllArgsConstructor
 public class DatabaseDummyDataInitializer {
-    @Autowired
-    private ActionRepository actionRepo;
+//    @Autowired
+//    private ActionRepository actionRepo;
 
     @Autowired
     private BaggageRepository baggageRepo;
@@ -44,12 +44,14 @@ public class DatabaseDummyDataInitializer {
     }
 
     private boolean isDatabaseEmpty() {
-        return actionRepo.count() == 0 ||
-                baggageRepo.count() == 0 ||
+        return baggageRepo.count() == 0 ||
                 boardingRepo.count() == 0 ||
                 customerRepo.count() == 0 ||
                 employeeRepo.count() == 0 ||
                 flightRepo.count() == 0;
+
+        //for now we don't have any actions
+        //actionRepo.count() == 0 ||
     }
 
     private void insertEmployees(){
@@ -114,7 +116,7 @@ public class DatabaseDummyDataInitializer {
         return boardingpass;
     }
 
-    private BaggageEntity insertBaggage(BoardingPassEntity boarding){
+    private void insertBaggage(BoardingPassEntity boarding){
         BaggageEntity baggage = BaggageEntity.builder()
                 .weight(90.0)
                 .boardingPass(boarding)
@@ -122,6 +124,5 @@ public class DatabaseDummyDataInitializer {
                 .build();
 
         baggageRepo.save(baggage);
-        return baggage;
     }
 }
