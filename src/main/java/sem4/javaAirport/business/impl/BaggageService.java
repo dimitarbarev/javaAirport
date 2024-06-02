@@ -18,15 +18,14 @@ public class BaggageService implements IBaggageService {
 //    @Autowired
     private final BaggageRepository baggageRepository;
 
-    @Transactional
+/*    @Transactional
     public void testUpdateBaggageStatus() {
         try {
             updateBaggageStatus(1L, BaggageStatus.SECURITY);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
+    }*/
     @Override
     @Transactional
     public void updateBaggageStatus(Long baggageId, BaggageStatus newStatus) throws Exception {
@@ -43,45 +42,46 @@ public class BaggageService implements IBaggageService {
 
 
     public void moveToNextStatus(Long baggageId) throws Exception {
-        BaggageEntity baggage = baggageRepository.findById(baggageId)
-                .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
+        if (baggageId == null) {
+            throw new IllegalArgumentException("The given id must not be null.");
+        }
+        try {
+            System.out.println("Transaction started for moveToNextStatus");
+            BaggageEntity baggage = baggageRepository.findById(baggageId)
+                    .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
 
-        BaggageStatus currentStatus = baggage.getStatus();
-        BaggageStatus nextStatus;
+            BaggageStatus currentStatus = baggage.getStatus();
+            BaggageStatus nextStatus = determineNextStatus(currentStatus);
+            baggage.setStatus(nextStatus);
+            baggageRepository.save(baggage);
+            baggageRepository.flush(); // Force the update
+            System.out.println("Status updated to: " + nextStatus);
+            System.out.println("Transaction completed successfully");
+        } catch (Exception e) {
+            System.out.println("Error during transaction: " + e.getMessage());
+            throw e;
+        }
+    }
 
+
+    private BaggageStatus determineNextStatus(BaggageStatus currentStatus) throws Exception {
         switch (currentStatus) {
             case CHECKED_IN:
-                nextStatus = BaggageStatus.SECURITY;
-                break;
+                return BaggageStatus.SECURITY;
             case SECURITY:
-                if (needsManualCheck(baggage)) {
-                    nextStatus = BaggageStatus.MANUAL_CHECK;
-                } else {
-                    nextStatus = BaggageStatus.LOADED;
-                }
-                break;
-            case MANUAL_CHECK:
-                nextStatus = BaggageStatus.LOADED;
-                break;
+                return BaggageStatus.LOADED;
             case LOADED:
-                nextStatus = BaggageStatus.ARRIVED;
-                break;
+                return BaggageStatus.ARRIVED;
             case ARRIVED:
-                nextStatus = BaggageStatus.ON_BELT;
-                break;
+                return BaggageStatus.ON_BELT;
             case ON_BELT:
-                nextStatus = BaggageStatus.CLAIMED;
-                break;
+                return BaggageStatus.CLAIMED;
             case CLAIMED:
                 throw new Exception("Baggage is already claimed.");
             default:
                 throw new Exception("Invalid status transition.");
         }
-
-        baggage.setStatus(nextStatus);
-        baggageRepository.save(baggage);
     }
-
 
     private boolean needsManualCheck(BaggageEntity baggage) {
         // Example criteria for a manual check
@@ -139,3 +139,36 @@ public class BaggageService implements IBaggageService {
 
 
 }
+/* @Transactional
+    public void moveToNextStatus(Long baggageId) throws Exception {
+        BaggageEntity baggage = baggageRepository.findById(baggageId)
+                .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
+
+        BaggageStatus currentStatus = baggage.getStatus();
+        BaggageStatus nextStatus;
+
+        switch (currentStatus) {
+            case CHECKED_IN:
+                nextStatus = BaggageStatus.SECURITY;
+                break;
+            case SECURITY:
+                nextStatus = BaggageStatus.LOADED;
+                break;
+            case LOADED:
+                nextStatus = BaggageStatus.ARRIVED;
+                break;
+            case ARRIVED:
+                nextStatus = BaggageStatus.ON_BELT;
+                break;
+            case ON_BELT:
+                nextStatus = BaggageStatus.CLAIMED;
+                break;
+            case CLAIMED:
+                throw new Exception("Baggage is already claimed.");
+            default:
+                throw new Exception("Invalid status transition.");
+        }
+
+        baggage.setStatus(nextStatus);
+        baggageRepository.save(baggage);
+    }*/

@@ -1,5 +1,6 @@
 package sem4.javaAirport;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -24,12 +25,18 @@ import sem4.javaAirport.configuration.AppConfig;
 import sem4.javaAirport.controllers.QRController;
 import sem4.javaAirport.domain.BaggageStatusDTO;
 import org.opencv.core.Core;
+import sem4.javaAirport.persistence.entity.BaggageStatus;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootApplication
 public class MainApp extends Application {
@@ -37,6 +44,7 @@ public class MainApp extends Application {
     private QRController qrController;
     private VideoCapture capture;
     private ImageView imageView;
+    private TextField scannerInput;
 
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -52,15 +60,50 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         imageView = new ImageView();
-        VBox root = new VBox();
-        root.getChildren().add(imageView);
+        scannerInput = new TextField();
+        scannerInput.setPromptText("Scan QR code here");
+        scannerInput.setOnAction(event -> {
+            String qrCodeData = scannerInput.getText();
+            System.out.println("Scanned QR Code Data: " + qrCodeData); // Added logging
+            handleQRCodeScan(qrCodeData);
+            scannerInput.clear();
+        });
 
+        VBox root = new VBox(imageView, scannerInput);
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("QR Code Scanner");
         primaryStage.show();
 
-        startCamera();
+        //startCamera();
+    }
+
+    private void handleQRCodeScan(String qrCodeData) {
+        try {
+            // Log the raw scanned QR code data
+            System.out.println("Scanned QR Code Data: " + qrCodeData);
+
+            // Parse the custom formatted data
+            String[] parts = qrCodeData.split(",");
+            System.out.println("Parsed QR Code Data: " + parts.length + " parts");
+
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("Invalid QR code format");
+            }
+
+            Long baggageId = Long.parseLong(parts[0]);
+            String newStatus = parts[1];
+
+            // Create BaggageStatusDTO from parsed data
+            BaggageStatusDTO statusUpdate = new BaggageStatusDTO();
+            statusUpdate.setBaggageId(baggageId);
+            statusUpdate.setNewStatus(BaggageStatus.valueOf(newStatus)); // Ensure BaggageStatus enum is used
+
+            qrController.scanQRCode(statusUpdate);
+            System.out.println("Baggage status updated successfully.");
+        } catch (Exception e) {
+            System.out.println("Error updating status: " + e.getMessage());
+        }
     }
 
     private void startCamera() {
@@ -72,10 +115,10 @@ public class MainApp extends Application {
                 Platform.runLater(() -> {
                     imageView.setImage(bufferedImageToImage(bufferedImage));
                     try {
-                        BaggageStatusDTO statusUpdate = QRCodeDecoder.decodeQRCode(bufferedImage);
-                        if (statusUpdate != null) {
-                            qrController.scanQRCode(statusUpdate);
-                            System.out.println("Baggage status updated successfully");
+                        String decodedQR = QRCodeDecoder.decodeQRCodeFromImage(bufferedImage);
+                        if (decodedQR != null) {
+                            System.out.println("Decoded QR Code: " + decodedQR); // Added logging
+                            handleQRCodeScan(decodedQR);
                         }
                     } catch (com.google.zxing.NotFoundException e) {
                         System.out.println("QR code not found: " + e.getMessage());

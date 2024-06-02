@@ -11,25 +11,28 @@ import java.awt.image.BufferedImage;
 
 public class QRCodeDecoder {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    public static String decodeQRCodeFromImage(BufferedImage bufferedImage) {
-        try {
-            BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(bufferedImage)));
-            Result result = new QRCodeReader().decode(binaryBitmap);
-            return result.getText();
-        } catch (ReaderException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static String decodeQRCodeFromImage(BufferedImage bufferedImage) throws Exception {
+        LuminanceSource source = new BufferedImageLuminanceSource(bufferedImage);
+        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+        Result result = new MultiFormatReader().decode(bitmap);
+        return result.getText();
     }
-
-    public static BaggageStatusDTO decodeQRCode(BufferedImage bufferedImage) throws Exception {
+// private static final ObjectMapper objectMapper = new ObjectMapper();
+/*    public static BaggageStatusDTO decodeQRCode(BufferedImage bufferedImage) throws Exception {
         LuminanceSource source = new BufferedImageLuminanceSource(bufferedImage);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         Result result = new MultiFormatReader().decode(bitmap);
         return objectMapper.readValue(result.getText(), BaggageStatusDTO.class);
-    }
+    }*/
+    /*public static BaggageStatusDTO decodeQRCode(BufferedImage bufferedImage) throws Exception {
+        LuminanceSource source = new BufferedImageLuminanceSource(bufferedImage);
+        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+        Result result = new MultiFormatReader().decode(bitmap);
+        BaggageStatusDTO statusDTO = objectMapper.readValue(result.getText(), BaggageStatusDTO.class);
+        System.out.println("Decoded QR Code: " + statusDTO);
+        return statusDTO;
+    }*/
+
 
 }
 
