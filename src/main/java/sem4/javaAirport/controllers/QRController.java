@@ -90,6 +90,24 @@ public class QRController {
         }
     }
 
+    @PostMapping("/approveManualCheck")
+    public ResponseEntity<String> approveManualCheck(@RequestParam Long baggageId) {
+        try {
+            baggageService.approveManualCheck(baggageId);
+            return ResponseEntity.ok("Baggage status updated to LOADED after manual check");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error approving manual check: " + e.getMessage());
+        }
+    }
+    @GetMapping("/isBaggageSuspicious")
+    public ResponseEntity<Boolean> isBaggageSuspicious(@RequestParam Long baggageId) {
+        try {
+            boolean suspicious = baggageService.isBaggageSuspicious(baggageId);
+            return ResponseEntity.ok(suspicious);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(false);
+        }
+    }
 }
 
 

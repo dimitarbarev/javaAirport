@@ -16,17 +16,9 @@ import java.util.Optional;
 @AllArgsConstructor
 public class BaggageService implements IBaggageService {
 
-//    @Autowired
     private final BaggageRepository baggageRepository;
 
-/*    @Transactional
-    public void testUpdateBaggageStatus() {
-        try {
-            updateBaggageStatus(1L, BaggageStatus.SECURITY);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
+
     @Override
     @Transactional
     public void updateBaggageStatus(Long baggageId, BaggageStatus newStatus) throws Exception {
@@ -79,6 +71,8 @@ public class BaggageService implements IBaggageService {
                 return BaggageStatus.CLAIMED;
             case CLAIMED:
                 throw new Exception("Baggage is already claimed.");
+            case MANUAL_CHECK:
+                return BaggageStatus.LOADED;
             default:
                 throw new Exception("Invalid status transition.");
         }
@@ -95,6 +89,25 @@ public class BaggageService implements IBaggageService {
         return isWeightSuspicious(baggage.getWeight()) || isSizeSuspicious(baggage.getSize()) || isRandomlySelected();
     }
 
+    // New method to approve manual check and move to the next status
+    @Transactional
+    public void approveManualCheck(Long baggageId) throws Exception {
+        BaggageEntity baggage = baggageRepository.findById(baggageId)
+                .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
+        if (baggage.getStatus() == BaggageStatus.MANUAL_CHECK) {
+            baggage.setStatus(BaggageStatus.LOADED);
+            baggageRepository.save(baggage);
+        } else {
+            throw new Exception("Baggage is not in manual check status.");
+        }
+    }
+
+    // New method to check if baggage is suspicious
+    public boolean isBaggageSuspicious(Long baggageId) throws Exception {
+        BaggageEntity baggage = baggageRepository.findById(baggageId)
+                .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
+        return needsManualCheck(baggage);
+    }
     @Transactional
     public void triggerManualCheck(Long baggageId) throws Exception {
         BaggageEntity baggage = baggageRepository.findById(baggageId)

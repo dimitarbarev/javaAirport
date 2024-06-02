@@ -32,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+
 @SpringBootApplication
 public class MainApp extends Application {
     private static ConfigurableApplicationContext springContext;
@@ -42,6 +43,8 @@ public class MainApp extends Application {
     private TextArea baggageInfoArea;
     private Button approveButton;
     private Button denyButton;
+    private Button manualCheckButton;
+    //private Button approveManualCheckButton;
     private BaggageStatusDTO currentStatusUpdate;
 
     public static void main(String[] args) {
@@ -77,7 +80,15 @@ public class MainApp extends Application {
         denyButton = new Button("Deny");
         denyButton.setOnAction(event -> handleDeny());
 
-        HBox buttonBox = new HBox(approveButton, denyButton);
+        manualCheckButton = new Button("Manual Check");
+        manualCheckButton.setOnAction(event -> handleManualCheck());
+        manualCheckButton.setDisable(true);
+
+        /*approveManualCheckButton = new Button("Approve Manual Check");
+        approveManualCheckButton.setOnAction(event -> handleApproveManualCheck());
+        approveManualCheckButton.setDisable(true);*/
+
+        HBox buttonBox = new HBox(approveButton, denyButton, manualCheckButton /*,approveManualCheckButton*/);
         VBox root = new VBox(imageView, scannerInput, baggageInfoArea, buttonBox);
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
@@ -112,9 +123,25 @@ public class MainApp extends Application {
             String baggageInfo = qrController.getBaggageInfo(baggageId); // Assuming a method to fetch baggage info
             baggageInfoArea.setText(baggageInfo);
 
+            // Check if the baggage is suspicious
+            boolean isSuspicious = qrController.isBaggageSuspicious(baggageId).getBody();
+            if (isSuspicious) {
+                baggageInfoArea.appendText("\nBaggage flagged as suspicious!");
+                manualCheckButton.setDisable(false);
+            } else {
+                manualCheckButton.setDisable(true);
+            }
+
             // Enable buttons
             approveButton.setDisable(false);
             denyButton.setDisable(false);
+
+      /*      // Check if the baggage is in MANUAL_CHECK status
+            if (BaggageStatus.MANUAL_CHECK.equals(currentStatusUpdate.getNewStatus())) {
+                approveManualCheckButton.setDisable(false);
+            } else {
+                approveManualCheckButton.setDisable(true);
+            }*/
         } catch (Exception e) {
             System.out.println("Error updating status: " + e.getMessage());
         }
@@ -142,10 +169,40 @@ public class MainApp extends Application {
         clearCurrentStatusUpdate();
     }
 
+    private void handleManualCheck() {
+        if (currentStatusUpdate != null) {
+            try {
+                qrController.triggerManualCheck(currentStatusUpdate.getBaggageId());
+                System.out.println("Manual check triggered successfully.");
+                baggageInfoArea.appendText("\nManual check triggered successfully.");
+            } catch (Exception e) {
+                System.out.println("Error triggering manual check: " + e.getMessage());
+                baggageInfoArea.appendText("\nError triggering manual check: " + e.getMessage());
+            }
+        }
+        clearCurrentStatusUpdate();
+    }
+
+    private void handleApproveManualCheck() {
+        if (currentStatusUpdate != null) {
+            try {
+                qrController.approveManualCheck(currentStatusUpdate.getBaggageId());
+                System.out.println("Baggage status updated to LOADED after manual check.");
+                baggageInfoArea.appendText("\nBaggage status updated to LOADED after manual check.");
+            } catch (Exception e) {
+                System.out.println("Error approving manual check: " + e.getMessage());
+                baggageInfoArea.appendText("\nError approving manual check: " + e.getMessage());
+            }
+        }
+        clearCurrentStatusUpdate();
+    }
+
     private void clearCurrentStatusUpdate() {
         currentStatusUpdate = null;
         approveButton.setDisable(true);
         denyButton.setDisable(true);
+        manualCheckButton.setDisable(true);
+        //approveManualCheckButton.setDisable(true);
     }
 
     private void startCamera() {

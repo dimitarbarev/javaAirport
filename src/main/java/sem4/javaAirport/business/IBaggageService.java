@@ -12,5 +12,9 @@ public interface IBaggageService {
 
     String getBaggageInfo(Long baggageId) throws Exception;
 
+    boolean isBaggageSuspicious(Long baggageId) throws Exception;
+
+    void approveManualCheck(Long baggageId) throws Exception;
+
 
 }
