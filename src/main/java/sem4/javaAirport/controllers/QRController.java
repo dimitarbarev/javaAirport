@@ -13,6 +13,7 @@ import com.google.zxing.WriterException;
 import jakarta.servlet.http.HttpServletResponse;
 import sem4.javaAirport.business.impl.QRCodeDecoder;
 import sem4.javaAirport.domain.BaggageStatusDTO;
+import sem4.javaAirport.persistence.entity.BaggageEntity;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -59,32 +60,15 @@ public class QRController {
             System.out.println("Error updating status: " + e.getMessage());
         }
     }
-/*    @PostMapping("/scanQRCode")
-    public ResponseEntity<String> scanQRCodeEndpoint(@RequestBody String base64Encoded) {
+
+    @GetMapping("/baggageInfo")
+    public String getBaggageInfo(@RequestParam Long baggageId) {
         try {
-            byte[] decodedBytes = Base64.getDecoder().decode(base64Encoded);
-            String json = new String(decodedBytes, StandardCharsets.UTF_8);
-            BaggageStatusDTO statusUpdate = new ObjectMapper().readValue(json, BaggageStatusDTO.class);
-            baggageService.moveToNextStatus(statusUpdate.getBaggageId());
-            System.out.println("Baggage status updated successfully.");
-            return ResponseEntity.ok("Baggage status updated successfully");
+            return baggageService.getBaggageInfo(baggageId);
         } catch (Exception e) {
-            System.out.println("Error updating status: " + e.getMessage());
-            return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
+            return "Error retrieving baggage info: " + e.getMessage();
         }
     }
-
-
-    public void scanQRCode(BaggageStatusDTO statusUpdate) {
-        try {
-            System.out.println("Processing status update: " + statusUpdate);
-            baggageService.moveToNextStatus(statusUpdate.getBaggageId());
-            System.out.println("Baggage status updated successfully.");
-        } catch (Exception e) {
-            System.out.println("Error updating status: " + e.getMessage());
-        }
-    }*/
-
 
     @PostMapping("/moveToNextStatus")
     public ResponseEntity<String> moveToNextStatus(@RequestParam Long baggageId) {

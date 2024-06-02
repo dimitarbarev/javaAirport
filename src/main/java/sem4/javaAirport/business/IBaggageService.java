@@ -10,7 +10,7 @@ public interface IBaggageService {
 
     void triggerManualCheck(Long baggageId) throws Exception;
 
-
+    String getBaggageInfo(Long baggageId) throws Exception;
 
 
 }

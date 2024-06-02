@@ -1,5 +1,6 @@
 package sem4.javaAirport.business.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,12 @@ public class BaggageService implements IBaggageService {
         }
     }
 
+    public String getBaggageInfo(Long baggageId) throws Exception {
+        BaggageEntity baggage = baggageRepository.findById(baggageId)
+                .orElseThrow(() -> new Exception("Baggage not found with id: " + baggageId));
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(baggage);
+    }
     private boolean needsManualCheck(BaggageEntity baggage) {
         // Example criteria for a manual check
         return isWeightSuspicious(baggage.getWeight()) || isSizeSuspicious(baggage.getSize()) || isRandomlySelected();

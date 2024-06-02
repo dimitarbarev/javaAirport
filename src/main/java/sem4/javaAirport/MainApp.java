@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
@@ -26,18 +27,11 @@ import sem4.javaAirport.controllers.QRController;
 import sem4.javaAirport.domain.BaggageStatusDTO;
 import org.opencv.core.Core;
 import sem4.javaAirport.persistence.entity.BaggageStatus;
-
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 @SpringBootApplication
 public class MainApp extends Application {
     private static ConfigurableApplicationContext springContext;
@@ -45,6 +39,10 @@ public class MainApp extends Application {
     private VideoCapture capture;
     private ImageView imageView;
     private TextField scannerInput;
+    private TextArea baggageInfoArea;
+    private Button approveButton;
+    private Button denyButton;
+    private BaggageStatusDTO currentStatusUpdate;
 
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -69,7 +67,18 @@ public class MainApp extends Application {
             scannerInput.clear();
         });
 
-        VBox root = new VBox(imageView, scannerInput);
+        baggageInfoArea = new TextArea();
+        baggageInfoArea.setEditable(false);
+        baggageInfoArea.setPromptText("Baggage information will be displayed here...");
+
+        approveButton = new Button("Approve");
+        approveButton.setOnAction(event -> handleApprove());
+
+        denyButton = new Button("Deny");
+        denyButton.setOnAction(event -> handleDeny());
+
+        HBox buttonBox = new HBox(approveButton, denyButton);
+        VBox root = new VBox(imageView, scannerInput, baggageInfoArea, buttonBox);
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("QR Code Scanner");
@@ -95,15 +104,48 @@ public class MainApp extends Application {
             String newStatus = parts[1];
 
             // Create BaggageStatusDTO from parsed data
-            BaggageStatusDTO statusUpdate = new BaggageStatusDTO();
-            statusUpdate.setBaggageId(baggageId);
-            statusUpdate.setNewStatus(BaggageStatus.valueOf(newStatus)); // Ensure BaggageStatus enum is used
+            currentStatusUpdate = new BaggageStatusDTO();
+            currentStatusUpdate.setBaggageId(baggageId);
+            currentStatusUpdate.setNewStatus(BaggageStatus.valueOf(newStatus)); // Ensure BaggageStatus enum is used
 
-            qrController.scanQRCode(statusUpdate);
-            System.out.println("Baggage status updated successfully.");
+            // Fetch baggage information and display it
+            String baggageInfo = qrController.getBaggageInfo(baggageId); // Assuming a method to fetch baggage info
+            baggageInfoArea.setText(baggageInfo);
+
+            // Enable buttons
+            approveButton.setDisable(false);
+            denyButton.setDisable(false);
         } catch (Exception e) {
             System.out.println("Error updating status: " + e.getMessage());
         }
+    }
+
+    private void handleApprove() {
+        if (currentStatusUpdate != null) {
+            try {
+                qrController.scanQRCode(currentStatusUpdate);
+                System.out.println("Baggage status updated successfully.");
+                baggageInfoArea.appendText("\nStatus approved and updated successfully.");
+            } catch (Exception e) {
+                System.out.println("Error approving status: " + e.getMessage());
+                baggageInfoArea.appendText("\nError approving status: " + e.getMessage());
+            }
+        }
+        clearCurrentStatusUpdate();
+    }
+
+    private void handleDeny() {
+        if (currentStatusUpdate != null) {
+            System.out.println("Status change denied for baggage ID: " + currentStatusUpdate.getBaggageId());
+            baggageInfoArea.appendText("\nStatus change denied.");
+        }
+        clearCurrentStatusUpdate();
+    }
+
+    private void clearCurrentStatusUpdate() {
+        currentStatusUpdate = null;
+        approveButton.setDisable(true);
+        denyButton.setDisable(true);
     }
 
     private void startCamera() {
