@@ -17,11 +17,8 @@ import sem4.javaAirport.persistence.entity.BaggageEntity;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+
 
 @RestController
 @RequiredArgsConstructor

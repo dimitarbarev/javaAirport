@@ -44,7 +44,6 @@ public class MainApp extends Application {
     private Button approveButton;
     private Button denyButton;
     private Button manualCheckButton;
-    //private Button approveManualCheckButton;
     private BaggageStatusDTO currentStatusUpdate;
 
     public static void main(String[] args) {
