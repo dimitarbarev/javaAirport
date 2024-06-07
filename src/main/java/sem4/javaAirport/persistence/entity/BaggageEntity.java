@@ -26,11 +26,14 @@ public class BaggageEntity {
 
     @Column(name = "weight")
     private Double weight;
+    @Column(name = "size")
+    private String size; // Example field for dimensions
 
     @ManyToOne
     @JoinColumn(name = "boardingPass_id")
     private BoardingPassEntity boardingPass;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private BaggageStatus status;
 
