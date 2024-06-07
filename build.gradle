@@ -46,7 +46,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-
 javafx {
     version = "17"
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.swing']

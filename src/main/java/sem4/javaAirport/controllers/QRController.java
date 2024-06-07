@@ -18,6 +18,7 @@ import sem4.javaAirport.persistence.entity.BaggageEntity;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Scanner;
 
 
 @RestController
@@ -105,6 +106,15 @@ public class QRController {
             return ResponseEntity.badRequest().body(false);
         }
     }
+
+    //just with testing purposes, will be changed by Bruno's branch 5
+/*    @GetMapping("/console-input")
+    public String consoleInput() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your name: ");
+        String name = scanner.nextLine();
+        scanner.close();
+        return "Hello, " + name + "!";
+    }*/
+
 }
-
-
