@@ -9,11 +9,13 @@ import org.springframework.stereotype.Component;
 import sem4.javaAirport.persistence.*;
 import sem4.javaAirport.persistence.entity.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 @Component
 @AllArgsConstructor
 public class DatabaseDummyDataInitializer {
-//    @Autowired
-//    private ActionRepository actionRepo;
 
     @Autowired
     private BaggageRepository baggageRepo;
@@ -32,13 +34,12 @@ public class DatabaseDummyDataInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void populateDatabaseInitialDummyData(){
-        if (isDatabaseEmpty())
-        {
-            CustomerEntity customer = insertCustomer();
-            FlightEntity flight = insertFlights();
-            BoardingPassEntity boarding = insertBoardingpass(customer, flight);
-            insertBaggage(boarding);
+    public void populateDatabaseInitialDummyData() {
+        if (isDatabaseEmpty()) {
+            List<CustomerEntity> customers = insertCustomers();
+            List<FlightEntity> flights = insertFlights();
+            List<BoardingPassEntity> boardings = insertBoardingPasses(customers, flights);
+            insertBaggage(boardings);
             insertEmployees();
         }
     }
@@ -49,80 +50,69 @@ public class DatabaseDummyDataInitializer {
                 customerRepo.count() == 0 ||
                 employeeRepo.count() == 0 ||
                 flightRepo.count() == 0;
-
-        //for now we don't have any actions
-        //actionRepo.count() == 0 ||
     }
 
-    private void insertEmployees(){
-        EmployeeEntity employee1 = EmployeeEntity.builder()
-                .name("Frank")
-                .jobTitle("security servant")
-                .build();
-
-        employeeRepo.save(employee1);
-
-        EmployeeEntity employee2 = EmployeeEntity.builder()
-                .name("Tomas")
-                .jobTitle("security servant")
-                .build();
-
-        employeeRepo.save(employee2);
+    private void insertEmployees() {
+        List<EmployeeEntity> employees = List.of(
+                EmployeeEntity.builder().name("Frank").jobTitle("security servant").build(),
+                EmployeeEntity.builder().name("Tomas").jobTitle("security servant").build(),
+                EmployeeEntity.builder().name("Greg").jobTitle("desk officer").build(),
+                EmployeeEntity.builder().name("Tobias").jobTitle("desk officer").build(),
+                EmployeeEntity.builder().name("Kim").jobTitle("special forces").build()
+        );
+        employeeRepo.saveAll(employees);
     }
 
-    private CustomerEntity insertCustomer(){
-        CustomerEntity customer1 = CustomerEntity.builder()
-                .name("Jeffry")
-                .country("Germany")
-                .build();
-
-        customerRepo.save(customer1);
-
-        CustomerEntity customer2 = CustomerEntity.builder()
-                .name("Juan")
-                .country("Spain")
-                .build();
-
-        customerRepo.save(customer2);
-
-        return customer2;
+    private List<CustomerEntity> insertCustomers() {
+        List<CustomerEntity> customers = List.of(
+                CustomerEntity.builder().name("Jeffry").country("Germany").build(),
+                CustomerEntity.builder().name("Juan").country("Spain").build(),
+                CustomerEntity.builder().name("Klaudio").country("Venezuela").build(),
+                CustomerEntity.builder().name("Vezuvii").country("Italy").build(),
+                CustomerEntity.builder().name("Shiridar").country("Kazakhstan").build()
+        );
+        customerRepo.saveAll(customers);
+        return new ArrayList<>(customers);
     }
 
-    private FlightEntity insertFlights(){
-        FlightEntity flight1 = FlightEntity.builder()
-                .panelNumber("FR456")
-                .travelCompany("WIZZAIR")
-                .build();
-
-        flightRepo.save(flight1);
-
-        FlightEntity flight2 = FlightEntity.builder()
-                .panelNumber("TK892")
-                .travelCompany("RAYANAIR")
-                .build();
-
-        flightRepo.save(flight2);
-
-        return flight2;
+    private List<FlightEntity> insertFlights() {
+        List<FlightEntity> flights = List.of(
+                FlightEntity.builder().panelNumber("FR456").travelCompany("WIZZAIR").build(),
+                FlightEntity.builder().panelNumber("TK892").travelCompany("RYANAIR").build(),
+                FlightEntity.builder().panelNumber("TU823").travelCompany("RYANAIR").build(),
+                FlightEntity.builder().panelNumber("PY167").travelCompany("RYANAIR").build(),
+                FlightEntity.builder().panelNumber("KL954").travelCompany("WIZZAIR").build()
+        );
+        flightRepo.saveAll(flights);
+        return new ArrayList<>(flights);
     }
 
-    private BoardingPassEntity insertBoardingpass(CustomerEntity customer, FlightEntity flight){
-        BoardingPassEntity boardingpass = BoardingPassEntity.builder()
-                .customer(customer)
-                .flight(flight)
-                .build();
+    private List<BoardingPassEntity> insertBoardingPasses(List<CustomerEntity> customers, List<FlightEntity> flights) {
+        Random randomGen = new Random();
+        List<BoardingPassEntity> boardings = new ArrayList<>();
 
-        boardingRepo.save(boardingpass);
-        return boardingpass;
+        for (CustomerEntity customer : customers) {
+            int flightIndex = randomGen.nextInt(flights.size());
+            BoardingPassEntity boarding = BoardingPassEntity.builder()
+                    .customer(customer)
+                    .flight(flights.get(flightIndex))
+                    .build();
+            boardings.add(boarding);
+            boardingRepo.save(boarding);
+        }
+        return boardings;
     }
 
-    private void insertBaggage(BoardingPassEntity boarding){
-        BaggageEntity baggage = BaggageEntity.builder()
-                .weight(90.0)
-                .boardingPass(boarding)
-                .status(BaggageStatus.CHECKED_IN)
-                .build();
-
-        baggageRepo.save(baggage);
+    private void insertBaggage(List<BoardingPassEntity> boardings) {
+        List<BaggageEntity> baggageList = new ArrayList<>();
+        for (BoardingPassEntity boarding : boardings) {
+            BaggageEntity baggage = BaggageEntity.builder()
+                    .weight(90.0)
+                    .boardingPass(boarding)
+                    .status(BaggageStatus.CHECKED_IN)
+                    .build();
+            baggageList.add(baggage);
+        }
+        baggageRepo.saveAll(baggageList);
     }
 }
