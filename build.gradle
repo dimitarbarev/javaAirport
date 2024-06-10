@@ -32,7 +32,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.google.zxing:javase:3.4.1'
-    implementation 'org.openpnp:opencv:4.9.0-0'
+    //implementation 'org.openpnp:opencv:4.9.0-0'
     implementation 'org.openjfx:javafx-controls:17'
     implementation 'org.openjfx:javafx-fxml:17'
     implementation 'org.openjfx:javafx-swing:17'

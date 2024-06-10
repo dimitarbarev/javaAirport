@@ -11,9 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.videoio.VideoCapture;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +23,7 @@ import sem4.javaAirport.business.impl.QRGeneratorImplementation;
 import sem4.javaAirport.configuration.AppConfig;
 import sem4.javaAirport.controllers.QRController;
 import sem4.javaAirport.domain.BaggageStatusDTO;
-import org.opencv.core.Core;
+
 import sem4.javaAirport.persistence.entity.BaggageStatus;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -37,7 +35,7 @@ import javafx.scene.control.TextArea;
 public class MainApp extends Application {
     private static ConfigurableApplicationContext springContext;
     private QRController qrController;
-    private VideoCapture capture;
+    //private VideoCapture capture;
     private ImageView imageView;
     private TextField scannerInput;
     private TextArea baggageInfoArea;
@@ -47,7 +45,7 @@ public class MainApp extends Application {
     private BaggageStatusDTO currentStatusUpdate;
 
     public static void main(String[] args) {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+       /* System.loadLibrary(Core.NATIVE_LIBRARY_NAME);*/
         Application.launch(MainApp.class, args);
     }
 
@@ -204,7 +202,7 @@ public class MainApp extends Application {
         //approveManualCheckButton.setDisable(true);
     }
 
-    private void startCamera() {
+   /* private void startCamera() {
         capture = new VideoCapture(0);
         Thread thread = new Thread(() -> {
             Mat frame = new Mat();
@@ -249,11 +247,11 @@ public class MainApp extends Application {
 
     private Image bufferedImageToImage(BufferedImage bufferedImage) {
         return SwingFXUtils.toFXImage(bufferedImage, null);
-    }
+    }*/
 
     @Override
     public void stop() {
-        capture.release();
+        //capture.release();
         springContext.close();
     }
 }
